@@ -9,6 +9,8 @@ NAME = wordpress-php-$(PHP_VER)
 ifeq ($(TAG),)
     ifneq ($(PHP_DEBUG),)
         TAG = $(PHP_VER)-debug
+    else ifneq ($(POLY_BUILD),)
+	TAG = $(PHP_VER)-poly
     else ifneq ($(PHP_DEV_MACOS),)
     	TAG = $(PHP_VER)-dev-macos
     else ifneq ($(PHP_DEV),)
@@ -21,6 +23,9 @@ endif
 ifneq ($(PHP_DEV_MACOS),)
     NAME := $(NAME)-dev-macos
     BASE_IMAGE_TAG := $(BASE_IMAGE_TAG)-dev-macos
+else ifneq ($(POLY_BUILD),)
+    NAME := $(NAME)-poly
+    BASE_IMAGE_TAG := $(BASE_IMAGE_TAG)-poly
 else ifneq ($(PHP_DEV),)
     NAME := $(NAME)-dev
     BASE_IMAGE_TAG := $(BASE_IMAGE_TAG)-dev
