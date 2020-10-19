@@ -23,9 +23,6 @@ endif
 ifneq ($(PHP_DEV_MACOS),)
     NAME := $(NAME)-dev-macos
     BASE_IMAGE_TAG := $(BASE_IMAGE_TAG)-dev-macos
-else ifneq ($(POLY_BUILD),)
-    NAME := $(NAME)-poly
-    BASE_IMAGE_TAG := $(BASE_IMAGE_TAG)-poly
 else ifneq ($(PHP_DEV),)
     NAME := $(NAME)-dev
     BASE_IMAGE_TAG := $(BASE_IMAGE_TAG)-dev

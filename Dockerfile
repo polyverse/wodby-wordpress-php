@@ -1,8 +1,44 @@
 ARG BASE_IMAGE_TAG
 
+FROM golang as polyscripter
+
+COPY polyscript/src/tokenizer /polyscripting/
+COPY polyscript/scripts /polyscripting/
+
+COPY ./polyscript/src/scrambler/* /go/src/github.com/polyverse/scrambler/
+
+WORKDIR  /go/src/github.com/polyverse/scrambler
+RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /polyscripting/php-scrambler
+
 FROM wodby/php:${BASE_IMAGE_TAG}
 
 USER root
+
+#add polyscripting
+ENV POLYSCRIPT_PATH "/usr/local/bin/polyscripting"
+ENV PHP_SRC_PATH "/usr/src/php"
+ENV PHP_DEPS \
+        argon2-dev \
+        curl-dev \
+        libsodium-dev \
+	gcc \
+        libedit-dev \
+        sqlite-dev \
+        oniguruma-dev
+ARG POLY_BUILD
+WORKDIR $POLYSCRIPT_PATH
+COPY --from=polyscripter /polyscripting/ ./
+
+RUN apk add --update --no-cache -t .wodby-ps-php-build-deps \
+                        $PHP_DEPS; \
+		mkdir "${PHP_SRC_PATH}"; \
+		tar -xvf /usr/src/php.tar.xz --directory $PHP_SRC_PATH --strip-components 1; \
+                cd "${PHP_SRC_PATH}"; \
+                ./configure $(php-config --configure-options); \
+                make; \
+                make install; \
+                cd -; 
+
 
 RUN set -ex; \
     \
